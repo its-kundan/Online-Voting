@@ -1,58 +1,29 @@
-import axios from 'axios'
-import { toast } from 'react-hot-toast'
+// Add these to your existing polls.service.js
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-
-export const createPoll = async (pollData, token) => {
+export const getPollsByUser = async (userId) => {
   try {
-    const { data } = await axios.post(`${API_URL}/polls`, pollData, {
+    const { data } = await axios.get(`${API_URL}/polls/user`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    toast.success('Poll created successfully!')
     return data
   } catch (error) {
-    toast.error(error.response?.data?.message || 'Failed to create poll')
+    toast.error(error.response?.data?.message || 'Failed to fetch user polls')
     throw error
   }
 }
 
-export const getPolls = async () => {
+export const deletePoll = async (pollId) => {
   try {
-    const { data } = await axios.get(`${API_URL}/polls`)
-    return data
-  } catch (error) {
-    toast.error(error.response?.data?.message || 'Failed to fetch polls')
-    throw error
-  }
-}
-
-export const getPollDetails = async (pollId) => {
-  try {
-    const { data } = await axios.get(`${API_URL}/polls/${pollId}`)
-    return data
-  } catch (error) {
-    toast.error(error.response?.data?.message || 'Failed to fetch poll details')
-    throw error
-  }
-}
-
-export const castVote = async (pollId, optionIndex, token) => {
-  try {
-    const { data } = await axios.post(
-      `${API_URL}/votes/${pollId}`,
-      { optionIndex },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+    await axios.delete(`${API_URL}/polls/${pollId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
-    )
-    toast.success('Vote submitted successfully!')
-    return data
+    })
+    toast.success('Poll deleted successfully')
   } catch (error) {
-    toast.error(error.response?.data?.message || 'Failed to submit vote')
+    toast.error(error.response?.data?.message || 'Failed to delete poll')
     throw error
   }
 }
